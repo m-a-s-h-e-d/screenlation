@@ -1,6 +1,7 @@
-from PIL import Image
-import pytesseract, cv2
+from PIL import Image, ImageDraw, ImageFont
+import pytesseract, cv2, os
 import numpy as np
+from pytesseract.pytesseract import Output
 
 
 # source https://www.askpython.com/python/examples/optical-character-recognition
@@ -52,43 +53,53 @@ lang_options = {
 class OCR:
     def __init__(self) -> None:
         self.langs = self.__langoptions__()
-        self.selected_lang = 'fra'
+        self.selected_lang = 'jp_vert'
     
-    def __langoptions__(self) -> dict:
+    def __langoptions__(self):
         tesseract_list = pytesseract.get_languages(config='')
         supported_langs = []
-        for k,v in lang_options:
+        for k,v in lang_options.items():
             if v in tesseract_list:
                 supported_langs.append(k)
         return sorted(supported_langs)
     
-    def get_langs(self) -> list:
+    def get_langs(self):
         return self.langs
 
-    def set_lang(self, idx) -> None:
+    def set_lang_idx(self, idx):
+        """set the language using the index"""
         lang = None
         try:
             lang = self.langs[idx]
         except IndexError:
             return
-        self.set_lang(lang)
+        self.set_lang_name(lang)
 
-    def set_lang(self, lang_name) -> None:
-        self.selected_lang = lang_options[lang_name]
-    
-    def get_text(self, img) -> str:
+    def set_lang_name(self, lang_name):
+        """set the language using the name of the language"""
+        try:
+            self.selected_lang = lang_options[lang_name]
+        except IndexError:
+            print('unknown language name')
+
+    def get_text(self, img):
         return pytesseract.image_to_string(img, lang=self.selected_lang)
 
+    def draw_textboxes(self, img):
+        data = pytesseract.image_to_data(img, output_type=Output.DICT)
+        print(data)
+        for i in range(len(data['level'])):
+            (x, y, w, h) = (data['left'][i], data['top'][i], data['width'][i], data['height'][i])
+            textbox = ImageDraw.Draw(img)
+            textbox.rectangle([(x, y), (x+w, y+h)], fill=None, outline='red') 
+        
+        img.show()
+
 if __name__ == '__main__':
-    img_name = 'jp_test.png'
-
-    # print('===================\nPROCESSED\n===================')
-    # # processing image test 
-    # clean_img = process_img(img_name)
-    # print(pytesseract.image_to_string(clean_img))
-
+    img_path = os.path.join(os.path.dirname(__file__), 'fr_test.png')
 
     print('===================\nUNPROCESSED\n===================')
     # unprocessed test
-    unprocessed_img = Image.open(img_name)
-    print(pytesseract.image_to_string(unprocessed_img, lang='jpn_vert'))
+    ocr = OCR()
+    ocr.set_lang_name(FRA)
+    ocr.draw_textboxes(Image.open(img_path))
