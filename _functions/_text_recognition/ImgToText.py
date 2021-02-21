@@ -62,15 +62,15 @@ class ParagraphBox:
     def end_coord(self):
         return (self.x2, self.y2)
     
-    def text(self):
-        return self.text
+    def get_text(self):
+        return ''.join(self.text)
 
     def set_text(self, text):
         self.text = text
 
 
 FILL_COLOR = (255, 255, 255)
-OPACITY = int(255 * 0.8)
+OPACITY = int(255 * 0.85)
         
 
 class OCR:
@@ -152,7 +152,7 @@ class OCR:
             txt = Image.new('RGBA', img.size, (255,255,255,0))
             fnt = ImageFont.truetype('arial')
             d = ImageDraw.Draw(txt)
-            d.text(box.start_coord(), "TEXT HERE", font=fnt, fill=(0, 0, 0, 255))
+            d.text(box.start_coord(), box.get_text(), font=fnt, fill=(0, 0, 0, 255))
             img = Image.alpha_composite(img, txt)
 
         img.show()
@@ -161,7 +161,6 @@ class OCR:
 if __name__ == '__main__':
     img_path = os.path.join(os.path.dirname(__file__), 'fr_test.png')
     img = Image.open(img_path)
-    print('===================\nUNPROCESSED\n===================')
     # unprocessed test
     ocr = OCR()
     ocr.set_lang_name(FRA)
