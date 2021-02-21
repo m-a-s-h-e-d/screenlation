@@ -23,15 +23,61 @@ def process_img(img_name):
     return processed_img
 
 
-def get_text(img,lang_code):
-    return pytesseract.image_to_string(img, lang=lang_code)
-
-
 def print_lang_codes():
     langs = pytesseract.get_languages(config='')
     for l in langs:
         print(f"'{l}': ,")
+
+
+CHI_TRA = "chinese (traditional)"
+CHI_TRA_VERT = "chinese (traditional, vertical)"
+CHI_SIM = "chinese (simplified)"
+CHI_SIM_VERT = "chinese (simplified, vertical)"
+JPN = "japanese"
+JPN_VERT = "japanese (vertical)"
+ENG = "english"
+FRA = "french"
+
+lang_options = {
+    CHI_TRA: 'chi_tra',
+    CHI_TRA_VERT: 'chi_tra_vert',
+    CHI_SIM: 'chi_sim',
+    CHI_SIM_VERT: 'chi_sim_vert',
+    JPN: 'jpn',
+    JPN_VERT: 'jpn_vert',
+    ENG: 'eng',
+    FRA: 'fra',
+}
+
+class OCR:
+    def __init__(self) -> None:
+        self.langs = self.__langoptions__()
+        self.selected_lang = 'fra'
     
+    def __langoptions__(self) -> dict:
+        tesseract_list = pytesseract.get_languages(config='')
+        supported_langs = []
+        for k,v in lang_options:
+            if v in tesseract_list:
+                supported_langs.append(k)
+        return sorted(supported_langs)
+    
+    def get_langs(self) -> list:
+        return self.langs
+
+    def set_lang(self, idx) -> None:
+        lang = None
+        try:
+            lang = self.langs[idx]
+        except IndexError:
+            return
+        self.set_lang(lang)
+
+    def set_lang(self, lang_name) -> None:
+        self.selected_lang = lang_options[lang_name]
+    
+    def get_text(self, img) -> str:
+        return pytesseract.image_to_string(img, lang=self.selected_lang)
 
 if __name__ == '__main__':
     img_name = 'jp_test.png'
