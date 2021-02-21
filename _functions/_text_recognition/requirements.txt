@@ -1,0 +1,6 @@
+pytesseract
+lxml
+bs4
+pillow
+cv2
+numpy
