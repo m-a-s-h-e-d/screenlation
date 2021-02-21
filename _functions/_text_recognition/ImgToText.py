@@ -70,7 +70,7 @@ class ParagraphBox:
 
 
 FILL_COLOR = (255, 255, 255)
-OPACITY = int(255 * 0.7)
+OPACITY = int(255 * 0.5)
         
 
 class OCR:
@@ -144,17 +144,18 @@ class OCR:
         """
         for box in textbox_list:
             # draw box around paragraph
-            base = Image.open(img).convert('RGBA')
+            img = img.convert('RGBA')
             overlay = Image.new('RGBA', img.size, FILL_COLOR+(0,))
             draw = ImageDraw.Draw(overlay)
             draw.rectangle([box.start_coord(), box.end_coord()], fill=FILL_COLOR+(OPACITY,), outline='red')
-            img = Image.alpha_composite(base, overlay)
-            img = img.convert('RGB')
-            draw = ImageDraw.Draw(img)
-            # draw.rectangle([box.start_coord(), box.end_coord()], fill=FILL_COLOR, outline='red')
-            
+            img = Image.alpha_composite(img, overlay)
+            txt = Image.new('RGBA', img.size, (255,255,255,0))
+            fnt = ImageFont.truetype('arial')
+            d = ImageDraw.Draw(txt)
+            d.text(box.start_coord(), (TEXT_HERE), font=fnt, fill=(0, 0, 0, 255))
             # add text on the rectangle here -> to get the text from box use <ParagraphBox>.text
             # box.text()
+            img = Image.alpha_composite(img, txt)
 
         img.show()
 
