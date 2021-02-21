@@ -15,6 +15,14 @@ class ScreenCapture:
 
     def grab_image(self):
         # print("Outputs: " + str(self.x1) + " " + str(self.y1) + " " + str(self.x2) + " "+ str(self.y2))
+        if self.x2 < self.x1:
+            temp = self.x1
+            self.x1 = self.x2
+            self.x2 = temp
+        if self.y2 < self.y1:
+            temp = self.y1
+            self.y1 = self.y2
+            self.y2 = temp
         img = ImageGrab.grab(bbox=(self.x1, self.y1, self.x2, self.y2))
         img.show()
 

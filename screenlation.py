@@ -33,12 +33,14 @@ class Home(tk.Frame):
         self.root = controller
         self.root.geometry("500x50")
         self.root.winfo_toplevel().title("Screenlation")
-        button1 = tk.Button(self, text="Selection Capture", command=lambda: controller.show_frame("CaptureScreen"))
-        button1.pack()
+        label1 = tk.Label(self, text="Hold left mouse button and drag to draw a region for capture. Press alt-f4 to exit.")
+        label1.pack(pady=10)
+        button1 = tk.Button(self, text="Region Capture", command=lambda: controller.show_frame("ScreenCapture"))
+        button1.pack(pady=5)
         max_width = self.root.winfo_screenwidth() * CaptureScreen.get_factor_x(self)
         max_height = self.root.winfo_screenheight() * CaptureScreen.get_factor_y(self)
         button2 = tk.Button(self, text="Fullscreen Capture", command=lambda: ScreenCapture.fullscreen_image(self, max_width, max_height))
-        button2.pack()
+        button2.pack(pady=5)
 
 # Capture Screenshot Screen
 class CaptureScreen(tk.Frame):
@@ -46,7 +48,7 @@ class CaptureScreen(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.root = controller
         self.lmb_down = False
-        self.root.attributes("-alpha", 0.1)
+        self.root.attributes("-alpha", 0.3)
         self.root.attributes("-fullscreen", True)
         self.root.bind("<ButtonPress-1>", self.on_mouse_down)
         self.root.bind("<ButtonRelease-1>", self.on_mouse_up)

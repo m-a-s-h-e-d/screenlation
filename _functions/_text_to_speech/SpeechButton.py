@@ -1,4 +1,3 @@
-from TextSpeech import TextSpeech
 from tkinter import *
 import tkinter
 from PIL import Image, ImageTk
