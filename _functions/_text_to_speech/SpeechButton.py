@@ -6,13 +6,14 @@ import pyttsx3
 
 
 class SpeechButton:
-    def __init__(self, textSpeech, text, root):
+    def __init__(self, text_speech, text, root):
         frame = tkinter.Frame(root)
         frame.pack()
         # load speaker image
-        self.speakerImage = Image.open("../../_images/speaker.jpg")
-        self.speakerImage = self.speakerImage.resize((25, 25), Image.ANTIALIAS)
-        self.photo = ImageTk.PhotoImage(self.speakerImage)
-        self.speakerBtn = Button(
-            root, image=self.photo, command=lambda: textSpeech.speak(text))
-        self.speakerBtn.pack(pady=20)
+        self.speaker_image = Image.open("../../_images/speaker.jpg")
+        self.speaker_image = self.speaker_image.resize(
+            (25, 25), Image.ANTIALIAS)
+        self.photo = ImageTk.PhotoImage(self.speaker_image)
+        self.speaker_btn = Button(
+            root, image=self.photo, command=lambda: text_speech.speak(text))
+        self.speaker_btn.pack()
