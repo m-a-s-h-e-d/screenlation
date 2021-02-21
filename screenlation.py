@@ -1,8 +1,13 @@
 import tkinter as tk
+from tkinter import *
 
 from _functions._screen_capture.Screenshot import ScreenCapture
+from _functions._translate_text.TextTranslator import TextTranslator
+from _functions._text_recognition.Application import ScrollBarMenu
 
 # Creates the container for all the frames / windows
+
+
 class App(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
@@ -20,27 +25,33 @@ class App(tk.Tk):
             frame.grid(row=0, column=0, sticky="nsew")
 
         self.show_frame("Home")
-    
+
     # Allows buttons to bring page to the top of stack
     def show_frame(self, page_name):
         frame = self.frames[page_name]
         frame.tkraise()
 
 # Home Screen
+
+
 class Home(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.root = controller
         self.root.geometry("500x50")
         self.root.winfo_toplevel().title("Screenlation")
-        button1 = tk.Button(self, text="Selection Capture", command=lambda: controller.show_frame("CaptureScreen"))
+        button1 = tk.Button(self, text="Selection Capture",
+                            command=lambda: controller.show_frame("CaptureScreen"))
         button1.pack()
         max_width = self.root.winfo_screenwidth() * CaptureScreen.get_factor_x(self)
         max_height = self.root.winfo_screenheight() * CaptureScreen.get_factor_y(self)
-        button2 = tk.Button(self, text="Fullscreen Capture", command=lambda: ScreenCapture.fullscreen_image(self, max_width, max_height))
+        button2 = tk.Button(self, text="Fullscreen Capture",
+                            command=lambda: ScreenCapture.fullscreen_image(self, max_width, max_height))
         button2.pack()
 
 # Capture Screenshot Screen
+
+
 class CaptureScreen(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -75,7 +86,7 @@ class CaptureScreen(tk.Frame):
     def on_mouse_down(self, temp):
         # print(temp)
         self.lmb_down = True
-        x1 = self.root.winfo_pointerx()  * self.get_factor_x()
+        x1 = self.root.winfo_pointerx() * self.get_factor_x()
         y1 = self.root.winfo_pointery() * self.get_factor_y()
         ScreenCapture.set_mouse_pos_1(self, x1, y1)
 
@@ -91,6 +102,41 @@ class CaptureScreen(tk.Frame):
     def on_motion(self, temp):
         if self.lmb_down:
             pass
+
+
+class Translate():
+    def __init__(self, root):
+        # frame for input, output
+        text_box_frame = Frame(root)
+        text_box_frame.pack()
+
+        # for translator
+        textTranslator = TextTranslator()
+
+        # Get the original text and translate it in output box based on the output scroll bar menu
+        def translate():
+            input_text = input_box.get(1.0, END)
+            target_language = output_scroll_bar_menu.get_selection()
+            translated = textTranslator.google_translate(
+                target_language, input_text)
+            output_box.insert(END, translated)
+
+        input_box = Text(text_box_frame, width=50, height=10)
+        input_box.config(highlightbackground="black")
+        translate_btn = Button(text_box_frame,
+                               text="translate",
+                               width=10,
+                               height=2,
+                               command=translate
+                               )
+        output_box = Text(text_box_frame, width=50, height=10)
+        output_box.config(highlightbackground="black")
+        input_box.pack(pady=20)
+        translate_btn.pack()
+        output_box.pack(pady=17)
+        output_scroll_bar_menu = ScrollBarMenu(
+            textTranslator.get_google_supported_language(), root)
+
 
 app = App()
 app.mainloop()
