@@ -144,13 +144,14 @@ class OCR:
         """
         for box in textbox_list:
             # draw box around paragraph
-            # overlay = Image.new('RGBA', img.size, FILL_COLOR+(0,))
-            # draw = ImageDraw.Draw(overlay)
-            # draw.rectangle([box.start_coord(), box.end_coord()], fill=FILL_COLOR+(OPACITY,), outline='red')
-            # img = Image.alpha_composite(img, overlay)
-            # img = img.convert('RGB')
+            base = Image.open(img).convert('RGBA')
+            overlay = Image.new('RGBA', img.size, FILL_COLOR+(0,))
+            draw = ImageDraw.Draw(overlay)
+            draw.rectangle([box.start_coord(), box.end_coord()], fill=FILL_COLOR+(OPACITY,), outline='red')
+            img = Image.alpha_composite(base, overlay)
+            img = img.convert('RGB')
             draw = ImageDraw.Draw(img)
-            draw.rectangle([box.start_coord(), box.end_coord()], fill=FILL_COLOR, outline='red')
+            # draw.rectangle([box.start_coord(), box.end_coord()], fill=FILL_COLOR, outline='red')
             
             # add text on the rectangle here -> to get the text from box use <ParagraphBox>.text
             # box.text()
