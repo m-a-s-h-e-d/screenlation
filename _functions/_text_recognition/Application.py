@@ -85,7 +85,7 @@ class ScrollBarMenu:
         self.scrollbar.config(command = self.menu_box.yview)
 
     def get_selection(self):
-        print(self.menu_box.get(tkinter.ANCHOR))
+        return self.menu_box.get(tkinter.ANCHOR)
         
     
     
