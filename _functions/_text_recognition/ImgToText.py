@@ -68,6 +68,7 @@ class ParagraphBox:
     def set_text(self, text):
         self.text = text
 
+
 FILL_COLOR = (255, 255, 255)
 OPACITY = int(255 * 0.7)
         
@@ -115,10 +116,8 @@ class OCR:
     #         textbox.rectangle([(x, y), (x+w, y+h)], fill=None, outline='red') 
         
     #     img.show()
-
-    def draw_textboxes(self, img):
-        img = img.convert('RGBA')
-
+    
+    def get_textboxes(self, img):
         hocr = pytesseract.image_to_pdf_or_hocr(img, lang=self.selected_lang, extension='hocr')
         soup  = bs4.BeautifulSoup(hocr, features='lxml')
         paragraphs = soup.findAll('div', {'class': 'ocr_carea'})
@@ -126,23 +125,44 @@ class OCR:
         for p in paragraphs:
             dimension_text = p['title']
             dimensions = dimension_text.split(' ')
-            textboxes.append(ParagraphBox('test', int(dimensions[1]), int(dimensions[2]), int(dimensions[3]), int(dimensions[4])))
+            par_text = ''
+            # get paragraph text
+            words = p.findAll('span', {'class': 'ocrx_word'})
+            for i in range(len(words)):
+                if i == 0:
+                    par_text = ''.join((par_text, words[i].text))
+                else:
+                    par_text = ''.join((par_text, ' ', words[i].text))
+            
+            textboxes.append(ParagraphBox(par_text, int(dimensions[1]), int(dimensions[2]), int(dimensions[3]), int(dimensions[4])))
 
-        for box in textboxes:
+        return textboxes
+
+    def draw_textboxes(self, img, textbox_list):
+        """draws the textboxes on the image, the textboxes should be obtained from the get_textboxes method, or use a self-defined 
+        Paragraph array
+        """
+        for box in textbox_list:
             # draw box around paragraph
-            overlay = Image.new('RGBA', img.size, FILL_COLOR+(0,))
-            draw = ImageDraw.Draw(overlay)
-            draw.rectangle([box.start_coord(), box.end_coord()], fill=FILL_COLOR+(OPACITY,), outline='red')
-            img = Image.alpha_composite(img, overlay)
-            img = img.convert('RGB')
+            # overlay = Image.new('RGBA', img.size, FILL_COLOR+(0,))
+            # draw = ImageDraw.Draw(overlay)
+            # draw.rectangle([box.start_coord(), box.end_coord()], fill=FILL_COLOR+(OPACITY,), outline='red')
+            # img = Image.alpha_composite(img, overlay)
+            # img = img.convert('RGB')
+            draw = ImageDraw.Draw(img)
+            draw.rectangle([box.start_coord(), box.end_coord()], fill=FILL_COLOR, outline='red')
+            
+            # add text on the rectangle here -> to get the text from box use <ParagraphBox>.text
+            # box.text()
 
         img.show()
 
 
 if __name__ == '__main__':
     img_path = os.path.join(os.path.dirname(__file__), 'fr_test.png')
+    img = Image.open(img_path)
     print('===================\nUNPROCESSED\n===================')
     # unprocessed test
     ocr = OCR()
     ocr.set_lang_name(FRA)
-    ocr.draw_textboxes(Image.open(img_path))
+    ocr.draw_textboxes(img, ocr.get_textboxes(img))
