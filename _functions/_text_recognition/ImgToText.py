@@ -70,7 +70,7 @@ class ParagraphBox:
 
 
 FILL_COLOR = (255, 255, 255)
-OPACITY = int(255 * 0.5)
+OPACITY = int(255 * 0.8)
         
 
 class OCR:
@@ -152,9 +152,7 @@ class OCR:
             txt = Image.new('RGBA', img.size, (255,255,255,0))
             fnt = ImageFont.truetype('arial')
             d = ImageDraw.Draw(txt)
-            d.text(box.start_coord(), (TEXT_HERE), font=fnt, fill=(0, 0, 0, 255))
-            # add text on the rectangle here -> to get the text from box use <ParagraphBox>.text
-            # box.text()
+            d.text(box.start_coord(), "TEXT HERE", font=fnt, fill=(0, 0, 0, 255))
             img = Image.alpha_composite(img, txt)
 
         img.show()
