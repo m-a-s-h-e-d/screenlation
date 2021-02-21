@@ -4,6 +4,7 @@ from tkinter import *
 from _functions._screen_capture.Screenshot import ScreenCapture
 from _functions._translate_text.TextTranslator import TextTranslator
 from _functions._text_recognition.Application import ScrollBarMenu
+from _functions._text_recognition.ImgToText import OCR
 
 # Creates the container for all the frames / windows
 
