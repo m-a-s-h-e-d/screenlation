@@ -1,8 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 import pytesseract, cv2, os, bs4
 import numpy as np
-from pytesseract.pytesseract import Output
-
 
 # source https://www.askpython.com/python/examples/optical-character-recognition
 # using this as placeholder for now (text is recognized better without)
@@ -69,6 +67,9 @@ class ParagraphBox:
 
     def set_text(self, text):
         self.text = text
+
+FILL_COLOR = (255, 255, 255)
+OPACITY = int(255 * 0.7)
         
 
 class OCR:
@@ -116,6 +117,8 @@ class OCR:
     #     img.show()
 
     def draw_textboxes(self, img):
+        img = img.convert('RGBA')
+
         hocr = pytesseract.image_to_pdf_or_hocr(img, lang=self.selected_lang, extension='hocr')
         soup  = bs4.BeautifulSoup(hocr, features='lxml')
         paragraphs = soup.findAll('div', {'class': 'ocr_carea'})
@@ -126,8 +129,12 @@ class OCR:
             textboxes.append(ParagraphBox('test', int(dimensions[1]), int(dimensions[2]), int(dimensions[3]), int(dimensions[4])))
 
         for box in textboxes:
-            overlay = ImageDraw.Draw(img)
-            overlay.rectangle([box.start_coord(), box.end_coord()], fill=None, outline='red')
+            # draw box around paragraph
+            overlay = Image.new('RGBA', img.size, FILL_COLOR+(0,))
+            draw = ImageDraw.Draw(overlay)
+            draw.rectangle([box.start_coord(), box.end_coord()], fill=FILL_COLOR+(OPACITY,), outline='red')
+            img = Image.alpha_composite(img, overlay)
+            img = img.convert('RGB')
 
         img.show()
 
