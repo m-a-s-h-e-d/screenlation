@@ -1,5 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
-import pytesseract, cv2, os
+import pytesseract, cv2, os, bs4
 import numpy as np
 from pytesseract.pytesseract import Output
 
@@ -50,10 +50,31 @@ lang_options = {
     FRA: 'fra',
 }
 
+class ParagraphBox:
+    def __init__(self, text, x1, y1, x2, y2):
+        self.text = text
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
+
+    def start_coord(self):
+        return (self.x1, self.y1)
+    
+    def end_coord(self):
+        return (self.x2, self.y2)
+    
+    def text(self):
+        return self.text
+
+    def set_text(self, text):
+        self.text = text
+        
+
 class OCR:
     def __init__(self) -> None:
         self.langs = self.__langoptions__()
-        self.selected_lang = 'jp_vert'
+        self.selected_lang = lang_options[ENG]
     
     def __langoptions__(self):
         tesseract_list = pytesseract.get_languages(config='')
@@ -85,19 +106,34 @@ class OCR:
     def get_text(self, img):
         return pytesseract.image_to_string(img, lang=self.selected_lang)
 
-    def draw_textboxes(self, img):
-        data = pytesseract.image_to_data(img, output_type=Output.DICT)
-        print(data)
-        for i in range(len(data['level'])):
-            (x, y, w, h) = (data['left'][i], data['top'][i], data['width'][i], data['height'][i])
-            textbox = ImageDraw.Draw(img)
-            textbox.rectangle([(x, y), (x+w, y+h)], fill=None, outline='red') 
+    # def draw_textboxes(self, img):
+    #     data = pytesseract.image_to_data(img, output_type=Output.DICT, config='hocr')
+    #     for i in range(len(data['text'])):
+    #         (x, y, w, h) = (data['left'][i], data['top'][i], data['width'][i], data['height'][i])
+    #         textbox = ImageDraw.Draw(img)
+    #         textbox.rectangle([(x, y), (x+w, y+h)], fill=None, outline='red') 
         
+    #     img.show()
+
+    def draw_textboxes(self, img):
+        hocr = pytesseract.image_to_pdf_or_hocr(img, lang=self.selected_lang, extension='hocr')
+        soup  = bs4.BeautifulSoup(hocr, features='lxml')
+        paragraphs = soup.findAll('div', {'class': 'ocr_carea'})
+        textboxes = []
+        for p in paragraphs:
+            dimension_text = p['title']
+            dimensions = dimension_text.split(' ')
+            textboxes.append(ParagraphBox('test', int(dimensions[1]), int(dimensions[2]), int(dimensions[3]), int(dimensions[4])))
+
+        for box in textboxes:
+            overlay = ImageDraw.Draw(img)
+            overlay.rectangle([box.start_coord(), box.end_coord()], fill=None, outline='red')
+
         img.show()
+
 
 if __name__ == '__main__':
     img_path = os.path.join(os.path.dirname(__file__), 'fr_test.png')
-
     print('===================\nUNPROCESSED\n===================')
     # unprocessed test
     ocr = OCR()
