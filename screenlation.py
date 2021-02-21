@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import *
 
-from _functions._screen_capture.Screenshot import ScreenCapture
+from _functions._screen_capture.screenshot import ScreenCapture
 from _functions._translate_text.TextTranslator import TextTranslator
 from _functions._text_recognition.Application import ScrollBarMenu
 from _functions._text_recognition.ImgToText import OCR
@@ -123,6 +123,7 @@ class Translate():
             target_language = output_scroll_bar_menu.get_selection()
             translated = textTranslator.google_translate(
                 target_language, input_text)
+            output_box.delete(1.0, END)
             output_box.insert(END, translated)
 
         input_box = Text(text_box_frame, width=50, height=10)
